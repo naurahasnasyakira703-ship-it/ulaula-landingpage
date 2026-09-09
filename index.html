@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Master - Game Latihan Konsentrasi</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tone.js for dynamic sound effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+        }
+        .perspective-card {
+            perspective: 1000px;
+        }
+        .pulse-subtle {
+            animation: pulse-subtle 2s infinite ease-in-out;
+        }
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.9; }
+        }
+        .grid-cell {
+            transition: all 0.15s ease-in-out;
+        }
+        .grid-cell:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <!-- Top Header Navigation -->
+    <header class="w-full bg-slate-800/80 backdrop-blur-md border-b border-slate-700 p-4 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-brain text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg md:text-xl tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">FOCUS MASTER</h1>
+                    <p class="text-xs text-slate-400">Asah Otak & Konsentrasi</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="bg-slate-700/60 px-3 py-1.5 rounded-lg border border-slate-600 text-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-trophy text-amber-400"></i>
+                    <span>Skor Tertinggi: <strong id="highScoreText" class="text-amber-400">0</strong></span>
+                </div>
+                <button id="soundToggleBtn" class="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition text-slate-300">
+                    <i class="fa-solid fa-volume-high" id="soundIcon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-2xl">
+            
+            <!-- MENU SCREEN -->
+            <div id="menuScreen" class="space-y-6">
+                <div class="text-center space-y-2">
+                    <h2 class="text-3xl font-extrabold text-white">Pilih Mode Latihan</h2>
+                    <p class="text-slate-400 text-sm">Tingkatkan daya ingat, kecepatan reaksi, dan fokus pikiran Anda.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Mode 1: Color Stroop -->
+                    <button onclick="selectMode('stroop')" class="group p-5 bg-slate-800 hover:bg-indigo-950/40 border border-slate-700 hover:border-indigo-500/50 rounded-2xl text-left transition duration-200 flex flex-col justify-between h-48 relative overflow-hidden shadow-xl">
+                        <div class="absolute -right-4 -bottom-4 text-slate-700/20 group-hover:text-indigo-500/20 text-8xl transition">
+                            <i class="fa-solid fa-palette"></i>
+                        </div>
+                        <div>
+                            <div class="w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-3 group-hover:bg-indigo-500 group-hover:text-white transition">
+                                <i class="fa-solid fa-palette text-lg"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-white group-hover:text-indigo-300">Stroop Warna</h3>
+                            <p class="text-xs text-slate-400 mt-1">Latih inhibisi otak. Pilih warna teks, abaikan tulisan warnanya.</p>
+                        </div>
+                        <span class="text-xs font-semibold text-indigo-400 flex items-center gap-1 group-hover:translate-x-1 transition">Main <i class="fa-solid fa-arrow-right"></i></span>
+                    </button>
+
+                    <!-- Mode 2: Memory Pattern -->
+                    <button onclick="selectMode('pattern')" class="group p-5 bg-slate-800 hover:bg-emerald-950/40 border border-slate-700 hover:border-emerald-500/50 rounded-2xl text-left transition duration-200 flex flex-col justify-between h-48 relative overflow-hidden shadow-xl">
+                        <div class="absolute -right-4 -bottom-4 text-slate-700/20 group-hover:text-emerald-500/20 text-8xl transition">
+                            <i class="fa-solid fa-border-all"></i>
+                        </div>
+                        <div>
+                            <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-3 group-hover:bg-emerald-500 group-hover:text-white transition">
+                                <i class="fa-solid fa-border-all text-lg"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-white group-hover:text-emerald-300">Pola Memori</h3>
+                            <p class="text-xs text-slate-400 mt-1">Latih memori jangka pendek. Ingat urutan kotak yang menyala.</p>
+                        </div>
+                        <span class="text-xs font-semibold text-emerald-400 flex items-center gap-1 group-hover:translate-x-1 transition">Main <i class="fa-solid fa-arrow-right"></i></span>
+                    </button>
+
+                    <!-- Mode 3: Speed Numbers -->
+                    <button onclick="selectMode('speed')" class="group p-5 bg-slate-800 hover:bg-amber-950/40 border border-slate-700 hover:border-amber-500/50 rounded-2xl text-left transition duration-200 flex flex-col justify-between h-48 relative overflow-hidden shadow-xl">
+                        <div class="absolute -right-4 -bottom-4 text-slate-700/20 group-hover:text-amber-500/20 text-8xl transition">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <div>
+                            <div class="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center mb-3 group-hover:bg-amber-500 group-hover:text-white transition">
+                                <i class="fa-solid fa-bolt text-lg"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-white group-hover:text-amber-300">Refleks Angka</h3>
+                            <p class="text-xs text-slate-400 mt-1">Latih kecepatan pemrosesan visual. Tekan angka dari yang terkecil secara urut.</p>
+                        </div>
+                        <span class="text-xs font-semibold text-amber-400 flex items-center gap-1 group-hover:translate-x-1 transition">Main <i class="fa-solid fa-arrow-right"></i></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- GAMEPLAY SCREEN -->
+            <div id="gameScreen" class="hidden bg-slate-800/90 border border-slate-700 rounded-3xl p-6 md:p-8 shadow-2xl relative">
+                <!-- Status Bar -->
+                <div class="flex justify-between items-center pb-6 border-b border-slate-700 mb-6">
+                    <button onclick="quitGame()" class="text-slate-400 hover:text-white text-sm flex items-center gap-2 transition">
+                        <i class="fa-solid fa-chevron-left"></i> Kembali
+                    </button>
+                    <div class="flex items-center space-x-6">
+                        <div class="text-center">
+                            <div class="text-xs text-slate-400">WAKTU</div>
+                            <div id="timerText" class="text-2xl font-black text-amber-400">30s</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xs text-slate-400">SKOR</div>
+                            <div id="scoreText" class="text-2xl font-black text-indigo-400">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GAME MODE 1: STROOP COLOR TEST -->
+                <div id="stroopArea" class="hidden flex-col items-center justify-center space-y-8 min-h-[300px]">
+                    <div class="text-center">
+                        <p class="text-slate-400 text-sm mb-2">Pilih tombol sesuai <span class="font-bold text-white underline decoration-indigo-500">WARNA TULISAN</span>, bukan teksnya!</p>
+                        <div id="stroopWord" class="text-5xl md:text-6xl font-black tracking-wider py-8 transition-all duration-200">
+                            MERAH
+                        </div>
+                    </div>
+                    
+                    <div id="stroopButtons" class="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-md">
+                        <!-- Dynamic Buttons generated by JS -->
+                    </div>
+                </div>
+
+                <!-- GAME MODE 2: PATTERN MEMORY -->
+                <div id="patternArea" class="hidden flex-col items-center justify-center space-y-6 min-h-[300px]">
+                    <div class="text-center">
+                        <p id="patternInstruction" class="text-slate-300 font-medium text-sm">Perhatikan urutan pola!</p>
+                    </div>
+                    <div id="patternGrid" class="grid grid-cols-3 gap-3 w-64 h-64 md:w-72 md:h-72">
+                        <!-- 9 Grid Items generated by JS -->
+                    </div>
+                </div>
+
+                <!-- GAME MODE 3: SPEED NUMBERS -->
+                <div id="speedArea" class="hidden flex-col items-center justify-center space-y-6 min-h-[300px]">
+                    <div class="text-center">
+                        <p id="speedInstruction" class="text-slate-300 font-medium text-sm">Tekan angka secara berurutan mulai dari yang <span class="text-amber-400 font-bold">TERKECIL</span>!</p>
+                    </div>
+                    <div id="speedGrid" class="grid grid-cols-3 md:grid-cols-4 gap-3 w-full max-w-md">
+                        <!-- Dynamic Grid generated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- GAME OVER MODAL -->
+            <div id="gameOverModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+                <div class="bg-slate-800 border border-slate-700 rounded-3xl p-6 md:p-8 max-w-md w-full text-center space-y-6 shadow-2xl animate-fade-in">
+                    <div class="w-16 h-16 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto text-3xl border border-indigo-500/30">
+                        <i class="fa-solid fa-award"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-black text-white">Sesi Selesai!</h3>
+                        <p id="gameOverSummary" class="text-slate-400 text-sm mt-1">Latihan yang bagus untuk otak Anda hari ini.</p>
+                    </div>
+
+                    <div class="bg-slate-900/60 rounded-2xl p-4 border border-slate-700/50 space-y-2">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Skor Akhir</span>
+                            <span id="finalScoreText" class="text-xl font-bold text-indigo-400">0</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Akurasi</span>
+                            <span id="accuracyText" class="text-xl font-bold text-emerald-400">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="quitGame()" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl font-bold text-slate-200 transition">
+                            Menu Utama
+                        </button>
+                        <button onclick="restartGame()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-white shadow-lg shadow-indigo-600/30 transition">
+                            Coba Lagi
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-4 text-xs text-slate-500 border-t border-slate-800">
+        Focus Master &copy; Game Melatih Konsentrasi & Visual Reflex
+    </footer>
+
+    <script>
+        // Audio synthesis using Tone.js
+        let synth;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!synth) {
+                synth = new Tone.Synth().toDestination();
+                synth.volume.value = -12;
+            }
+        }
+
+        function playSound(freq, duration = '8n') {
+            if (soundEnabled) {
+                try {
+                    initAudio();
+                    Tone.start();
+                    synth.triggerAttackRelease(freq, duration);
+                } catch(e) {}
+            }
+        }
+
+        function playCorrectSound() { playSound('C5', '8n'); }
+        function playWrongSound() { playSound('F3', '8n'); }
+        function playFinishSound() { playSound('G5', '4n'); }
+
+        // Sound Toggle
+        document.getElementById('soundToggleBtn').addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            if (soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high';
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark';
+            }
+        });
+
+        // Game State Variables
+        let currentMode = null;
+        let score = 0;
+        let highScore = localStorage.getItem('focus_master_highscore') || 0;
+        let timer = 30;
+        let timerInterval = null;
+        let totalAttempts = 0;
+        let correctAttempts = 0;
+
+        document.getElementById('highScoreText').innerText = highScore;
+
+        // UI View Switcher
+        const menuScreen = document.getElementById('menuScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const gameOverModal = document.getElementById('gameOverModal');
+
+        const stroopArea = document.getElementById('stroopArea');
+        const patternArea = document.getElementById('patternArea');
+        const speedArea = document.getElementById('speedArea');
+
+        function selectMode(mode) {
+            currentMode = mode;
+            menuScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            
+            stroopArea.classList.add('hidden');
+            patternArea.classList.add('hidden');
+            speedArea.classList.add('hidden');
+
+            score = 0;
+            totalAttempts = 0;
+            correctAttempts = 0;
+            updateScoreUI();
+
+            if (mode === 'stroop') {
+                timer = 30;
+                stroopArea.classList.remove('hidden');
+                initStroopMode();
+            } else if (mode === 'pattern') {
+                timer = 45;
+                patternArea.classList.remove('hidden');
+                initPatternMode();
+            } else if (mode === 'speed') {
+                timer = 30;
+                speedArea.classList.remove('hidden');
+                initSpeedMode();
+            }
+
+            startTimer();
+        }
+
+        function updateScoreUI() {
+            document.getElementById('scoreText').innerText = score;
+            document.getElementById('timerText').innerText = `${timer}s`;
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timer--;
+                document.getElementById('timerText').innerText = `${timer}s`;
+                if (timer <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            playFinishSound();
+
+            let accuracy = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 0;
+            
+            document.getElementById('finalScoreText').innerText = score;
+            document.getElementById('accuracyText').innerText = `${accuracy}%`;
+
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('focus_master_highscore', highScore);
+                document.getElementById('highScoreText').innerText = highScore;
+            }
+
+            gameOverModal.classList.remove('hidden');
+        }
+
+        function restartGame() {
+            gameOverModal.classList.add('hidden');
+            selectMode(currentMode);
+        }
+
+        function quitGame() {
+            clearInterval(timerInterval);
+            gameOverModal.classList.add('hidden');
+            gameScreen.classList.add('hidden');
+            menuScreen.classList.remove('hidden');
+        }
+
+        // =========================================================================
+        // MODE 1: STROOP COLOR TEST
+        // =========================================================================
+        const colorData = [
+            { name: 'MERAH', colorClass: 'text-red-500', bgClass: 'bg-red-500', key: 'red' },
+            { name: 'BIRU', colorClass: 'text-blue-500', bgClass: 'bg-blue-500', key: 'blue' },
+            { name: 'HIJAU', colorClass: 'text-emerald-500', bgClass: 'bg-emerald-500', key: 'green' },
+            { name: 'KUNING', colorClass: 'text-amber-400', bgClass: 'bg-amber-400', key: 'yellow' },
+            { name: 'UNGU', colorClass: 'text-purple-500', bgClass: 'bg-purple-500', key: 'purple' }
+        ];
+
+        let targetColorKey = '';
+
+        function initStroopMode() {
+            const btnContainer = document.getElementById('stroopButtons');
+            btnContainer.innerHTML = '';
+
+            colorData.forEach(c => {
+                const btn = document.createElement('button');
+                btn.className = `p-4 rounded-2xl text-white font-bold ${c.bgClass} hover:opacity-90 active:scale-95 transition shadow-lg text-sm md:text-base`;
+                btn.innerText = c.name;
+                btn.onclick = () => checkStroopAnswer(c.key);
+                btnContainer.appendChild(btn);
+            });
+
+            nextStroopRound();
+        }
+
+        function nextStroopRound() {
+            const textItem = colorData[Math.floor(Math.random() * colorData.length)];
+            const colorItem = colorData[Math.floor(Math.random() * colorData.length)];
+
+            targetColorKey = colorItem.key;
+
+            const wordElement = document.getElementById('stroopWord');
+            wordElement.innerText = textItem.name;
+            wordElement.className = `text-5xl md:text-6xl font-black tracking-wider py-8 transition-all duration-200 ${colorItem.colorClass}`;
+        }
+
+        function checkStroopAnswer(chosenKey) {
+            totalAttempts++;
+            if (chosenKey === targetColorKey) {
+                correctAttempts++;
+                score += 10;
+                playCorrectSound();
+            } else {
+                score = Math.max(0, score - 5);
+                playWrongSound();
+            }
+            updateScoreUI();
+            nextStroopRound();
+        }
+
+        // =========================================================================
+        // MODE 2: PATTERN MEMORY (SIMON SAYS STYLE)
+        // =========================================================================
+        let patternSequence = [];
+        let playerSequence = [];
+        let isDisplayingPattern = false;
+
+        function initPatternMode() {
+            const grid = document.getElementById('patternGrid');
+            grid.innerHTML = '';
+            patternSequence = [];
+            playerSequence = [];
+
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('button');
+                cell.className = `grid-cell rounded-2xl bg-slate-700 hover:bg-slate-600 border border-slate-600 w-full h-full transition shadow-md`;
+                cell.dataset.index = i;
+                cell.onclick = () => handlePatternClick(i);
+                grid.appendChild(cell);
+            }
+
+            nextPatternLevel();
+        }
+
+        function nextPatternLevel() {
+            playerSequence = [];
+            patternSequence.push(Math.floor(Math.random() * 9));
+            showPatternSequence();
+        }
+
+        function showPatternSequence() {
+            isDisplayingPattern = true;
+            document.getElementById('patternInstruction').innerText = "Perhatikan urutan pola...";
+            document.getElementById('patternInstruction').className = "text-amber-400 font-bold text-sm pulse-subtle";
+
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i >= patternSequence.length) {
+                    clearInterval(interval);
+                    isDisplayingPattern = false;
+                    document.getElementById('patternInstruction').innerText = "Giliran Anda! Ulangi polanya.";
+                    document.getElementById('patternInstruction').className = "text-emerald-400 font-bold text-sm";
+                    return;
+                }
+                
+                highlightCell(patternSequence[i]);
+                i++;
+            }, 600);
+        }
+
+        function highlightCell(index) {
+            const cells = document.getElementById('patternGrid').children;
+            const targetCell = cells[index];
+            if (!targetCell) return;
+
+            targetCell.classList.remove('bg-slate-700');
+            targetCell.classList.add('bg-indigo-500', 'shadow-indigo-500/50', 'scale-95');
+            playSound('E5', '8n');
+
+            setTimeout(() => {
+                targetCell.classList.remove('bg-indigo-500', 'shadow-indigo-500/50', 'scale-95');
+                targetCell.classList.add('bg-slate-700');
+            }, 350);
+        }
+
+        function handlePatternClick(index) {
+            if (isDisplayingPattern) return;
+
+            totalAttempts++;
+            playerSequence.push(index);
+            highlightCell(index);
+
+            const currentIndex = playerSequence.length - 1;
+
+            if (playerSequence[currentIndex] !== patternSequence[currentIndex]) {
+                playWrongSound();
+                score = Math.max(0, score - 5);
+                updateScoreUI();
+                document.getElementById('patternInstruction').innerText = "Salah! Mengulang urutan baru...";
+                document.getElementById('patternInstruction').className = "text-red-400 font-bold text-sm";
+                
+                setTimeout(() => {
+                    patternSequence = [];
+                    nextPatternLevel();
+                }, 1000);
+                return;
+            }
+
+            if (playerSequence.length === patternSequence.length) {
+                correctAttempts++;
+                score += 15;
+                updateScoreUI();
+                playCorrectSound();
+                setTimeout(() => {
+                    nextPatternLevel();
+                }, 800);
+            }
+        }
+
+        // =========================================================================
+        // MODE 3: SPEED NUMBERS (SCHULTE TABLE VARIANT)
+        // =========================================================================
+        let currentTargetNumber = 1;
+        let maxNumberInGrid = 12;
+
+        function initSpeedMode() {
+            currentTargetNumber = 1;
+            renderSpeedGrid();
+        }
+
+        function renderSpeedGrid() {
+            const grid = document.getElementById('speedGrid');
+            grid.innerHTML = '';
+            
+            let numbers = [];
+            for (let i = 1; i <= maxNumberInGrid; i++) {
+                numbers.push(i);
+            }
+            // Shuffle array
+            numbers.sort(() => Math.random() - 0.5);
+
+            numbers.forEach(num => {
+                const btn = document.createElement('button');
+                btn.className = `p-4 md:p-6 rounded-2xl bg-slate-700 hover:bg-slate-600 border border-slate-600 text-2xl font-black text-white transition active:scale-90 shadow-md flex items-center justify-center`;
+                btn.innerText = num;
+                btn.onclick = () => handleSpeedClick(num, btn);
+                grid.appendChild(btn);
+            });
+
+            document.getElementById('speedInstruction').innerHTML = `Tekan angka berikutnya: <span class="text-amber-400 font-extrabold text-xl">${currentTargetNumber}</span>`;
+        }
+
+        function handleSpeedClick(num, btnElement) {
+            totalAttempts++;
+            if (num === currentTargetNumber) {
+                correctAttempts++;
+                score += 10;
+                playCorrectSound();
+
+                btnElement.classList.add('opacity-0', 'pointer-events-none');
+
+                currentTargetNumber++;
+                if (currentTargetNumber > maxNumberInGrid) {
+                    score += 20; // Bonus round finish
+                    updateScoreUI();
+                    currentTargetNumber = 1;
+                    setTimeout(renderSpeedGrid, 300);
+                } else {
+                    document.getElementById('speedInstruction').innerHTML = `Tekan angka berikutnya: <span class="text-amber-400 font-extrabold text-xl">${currentTargetNumber}</span>`;
+                    updateScoreUI();
+                }
+            } else {
+                score = Math.max(0, score - 5);
+                playWrongSound();
+                updateScoreUI();
+            }
+        }
+    </script>
+</body>
+</html>
